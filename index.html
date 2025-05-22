@@ -493,59 +493,100 @@
       <p>#المهندس_عمرو_بن_الشيخ_مروان</p>
     </div>
 </div>
-
-<script>
 // إعداد Supabase
-const supabaseUrl = 'https://djjwpmcninjkwzcpymgm.supabase.co'; // استبدل هذا بعنوان مشروعك
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqandwbWNuaW5qa3d6Y3B5bWdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc0OTcyMTMsImV4cCI6MjA2MzA3MzIxM30.xMeR8EGpY24iPcgbfVZ9Dqk19YaJXwPJr-5g020f0Jw'; // استبدل هذا بالمفتاح العام
+const supabaseUrl = 'https://djjwpmcninjkwzcpymgm.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqandwbWNuaW5qa3d6Y3B5bWdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc0OTcyMTMsImV4cCI6MjA2MzA3MzIxM30.xMeR8EGpY24iPcgbfVZ9Dqk19YaJXwPJr-5g020f0Jw';
 const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-  a1.style.display = "none"
-  ab1.style.display = "none"
-  aa1.style.display = "none"
-  aa2.style.display = "none"
-  aa3.style.display = "none"
-  aa4.style.display = "none"
-    const data = JSON.parse(localStorage.getItem('data') || '[]');
-    let tasgel = JSON.parse(localStorage.getItem('tasgel')) || 0;
-    const maxRegistrations = JSON.parse(localStorage.getItem('maxRegistrations') || '[]');
-    
-    if (maxRegistrations != "") {
-        if (data.length < maxRegistrations) {
-            function checkLength(input, maxLength) {
-                if (input.value.length > maxLength) {
-                    input.value = input.value.slice(0, maxLength);
-                }
-            }
 
-            function checkLength1(input, maxLength) {
-                if (input.value.length > maxLength) {
-                    input.value = input.value.slice(0, maxLength);
-                }
-            }
-            
-            function isEnglish(text) {
-              return /^[A-Za-z\s]+$/.test(text);
-            }
-            
-            function isEmail(text) {
-              return text.endsWith("@gmail.com");
-            }
-            
-            function startsWith(phone) {
-              return phone.startsWith("010") || phone.startsWith("011") || phone.startsWith("012") || phone.startsWith("015");
-            }
-            
+// إخفاء العناصر غير الضرورية عند التحميل
+a1.style.display = "none";
+ab1.style.display = "none";
+aa1.style.display = "none";
+aa2.style.display = "none";
+aa3.style.display = "none";
+aa4.style.display = "none";
+ab2.style.display = "none";
+
+// تحقق مما إذا كان التسجيل مفتوحاً
+async function checkRegistrationStatus() {
+    try {
+        const { data: settings, error } = await supabase
+            .from('settings')
+            .select('max_registrations, registration_open')
+            .single();
+
+        if (error) throw error;
+
+        if (!settings.registration_open) {
+            userForm.style.display = "none";
+            a.style.display = "none";
+            aa.style.display = "none";
+            aa4.style.display = "block";
+            return false;
+        }
+
+        // التحقق من عدد المسجلين
+        const { count } = await supabase
+            .from('users')
+            .select('*', { count: 'exact' });
+
+        if (count >= settings.max_registrations) {
+            userForm.style.display = "none";
+            a.style.display = "none";
+            aa.style.display = "none";
+            aa2.style.display = "block";
+            return false;
+        }
+
+        return true;
+    } catch (error) {
+        console.error('Error checking registration status:', error);
+        return false;
+    }
+}
+
+// تحقق من طول الحقول
+function checkLength(input, maxLength) {
+    if (input.value.length > maxLength) {
+        input.value = input.value.slice(0, maxLength);
+    }
+}
+
+function checkLength1(input, maxLength) {
+    if (input.value.length > maxLength) {
+        input.value = input.value.slice(0, maxLength);
+    }
+}
+
+// تحقق من أن النص إنجليزي
+function isEnglish(text) {
+    return /^[A-Za-z\s]+$/.test(text);
+}
+
+// تحقق من صحة البريد الإلكتروني
+function isEmail(text) {
+    return /^[^\s@]+@gmail\.com$/.test(text);
+}
+
+// تحقق من رقم الهاتف
+function startsWith(phone) {
+    return phone.startsWith("010") || phone.startsWith("011") || 
+           phone.startsWith("012") || phone.startsWith("015");
+}
+
+// إرسال البيانات
 async function submit() {
-    const name = document.getElementById('name').value;
-    const useremail = document.getElementById('email').value;
-    const id = document.getElementById('id').value;
-    const phone = document.getElementById('phone').value;
+    const name = document.getElementById('name').value.trim();
+    const useremail = document.getElementById('email').value.trim();
+    const id = document.getElementById('id').value.trim();
+    const phone = document.getElementById('phone').value.trim();
     const imageFile = document.getElementById('image').files[0];
     const resala = document.getElementById('resala');
-    resala.innerHTML = ''; // مسح المحتوى الحالى
-    
+    resala.innerHTML = '';
+    document.getElementById("errror").textContent = "";
+
     // التحقق من صحة البيانات
-    if (!name || !useremail || id.length != 14 || phone.length != 11 || !imageFile) {
+    if (!name || !useremail || id.length !== 14 || phone.length !== 11 || !imageFile) {
         document.getElementById("errror").textContent = "*يرجى ملء جميع البيانات.";
         return;
     }
@@ -565,23 +606,26 @@ async function submit() {
         return;
     }
 
+    if (imageFile.size > 1048576) { // 1MB
+        document.getElementById("errror").textContent = "حجم الصورة يجب أن يكون أقل من 1MB.";
+        return;
+    }
+
     try {
-        // 1. تحميل الصورة إلى Supabase Storage
+        // تحميل الصورة
         const imageName = `profile_${Date.now()}_${imageFile.name}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('profiles') // اسم bucket
+        const { error: uploadError } = await supabase.storage
+            .from('profiles')
             .upload(imageName, imageFile);
 
         if (uploadError) throw uploadError;
 
-        // 2. الحصول على رابط الصورة
+        // الحصول على رابط الصورة
         const { data: imageUrlData } = await supabase.storage
             .from('profiles')
             .getPublicUrl(imageName);
 
-        const imageUrl = imageUrlData.publicUrl;
-
-        // 3. إنشاء الباركود
+        // إنشاء الباركود
         const barcodeData = `Email: ${useremail}, Name: ${name}, ID: ${id}, Phone: ${phone}`;
         const barcodeDiv = document.getElementById('barcode');
         barcodeDiv.innerHTML = '';
@@ -593,7 +637,7 @@ async function submit() {
 
         const barcodeImg = barcodeDiv.querySelector('img').src;
 
-        // 4. إدراج البيانات في جدول Supabase
+        // إدراج البيانات
         const { data, error } = await supabase
             .from('users')
             .insert([{
@@ -601,7 +645,7 @@ async function submit() {
                 useremail,
                 id,
                 phone,
-                image_url: imageUrl,
+                image_url: imageUrlData.publicUrl,
                 barcode_img: barcodeImg,
                 status: 'pending',
                 created_at: new Date().toISOString()
@@ -610,205 +654,80 @@ async function submit() {
 
         if (error) throw error;
 
-        // 5. عرض النتيجة للمستخدم
+        // حفظ البريد الإلكتروني في localStorage للإشارة إلى أن المستخدم مسجل
+        localStorage.setItem('registeredEmail', useremail);
+
+        // عرض النتيجة
         alert('تم حفظ بياناتك بنجاح!');
-        document.getElementById("errror").textContent = "";
+        showUserData(data[0]);
         
-        // تحديث واجهة المستخدم
-        document.getElementById("userForm").style.display = "none";
-        document.getElementById("a").style.display = "none";
-        document.getElementById("aa").style.display = "none";
-        document.getElementById("aa1").style.display = "flex";
-        document.getElementById("aa3").style.display = "flex";
-        document.getElementById("a1").style.display = "flex";
-        document.getElementById("ab1").style.display = "flex";
-
-        // عرض البيانات
-        document.getElementById("email1").value = useremail;
-        document.getElementById("image1").src = imageUrl;
-        document.getElementById("name1").value = name;
-        document.getElementById("id1").value = id;
-        document.getElementById("phone1").value = phone;
-
-        // إظهار حالة التسجيل
-        const statusMessage = document.createElement('div');
-        statusMessage.classList.add('status-message', 'pending');
-        statusMessage.textContent = `جارٍ مراجعة بياناتك...`;
-        resala.appendChild(statusMessage);
-
         // إعادة تعيين النموذج
         document.getElementById('userForm').reset();
 
     } catch (error) {
         console.error('Error:', error);
-        document.getElementById("errror").textContent = "حدث خطأ أثناء حفظ البيانات. يرجى المحاولة مرة أخرى.";
+        let errorMsg = "حدث خطأ أثناء حفظ البيانات. يرجى المحاولة مرة أخرى.";
         
         if (error.message.includes('duplicate key')) {
-            document.getElementById("errror").textContent = "هذه البيانات بالفعل مسجلة لدينا، وممنوع التسجيل بنفس البيانات اكثر من مرة.";
+            errorMsg = "هذه البيانات مسجلة بالفعل. لا يمكن التسجيل بنفس البيانات أكثر من مرة.";
         }
-    }
-}
-        } else if (data.length >= maxRegistrations) {
-            userForm.style.display = "none";
-            a.style.display = "none";
-            a1.style.display = "none";
-            aa.style.display = "none";
-            ab2.style.display = "none";
-            aa2.style.display = "block";
-        }
-    } else {
-        ab11.style.display = "none";
-        userForm.style.display = "none";
-        a.style.display = "none";
-        a1.style.display = "none";
-        aa.style.display = "none";
-        aa2.style.display = "none";
-        ab2.style.display = "none";
-        aa4.style.display = "block";
-    }
-
-    function showNotification(message, type) {
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.textContent = message;
-        document.body.appendChild(notification);
         
-        setTimeout(() => {
-            notification.classList.add('show');
-        }, 100);
-        
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                document.body.removeChild(notification);
-            }, 300);
-        }, 3000);
-    }
-
-    function deletData() {
-        message1.style.display = 'block';
-        overlay.style.display = 'block';
-    }
-
-async function taqed() {
-    const email = document.getElementById("email1").value;
-    
-    try {
-        // 1. حذف الصورة من التخزين (اختياري)
-        // يمكنك تخطي هذه الخطوة إذا كنت تريد الاحتفاظ بالصور
-        
-        // 2. حذف السجل من قاعدة البيانات
-        const { error } = await supabase
-            .from('users')
-            .delete()
-            .eq('useremail', email);
-
-        if (error) throw error;
-
-        alert('تم حذف بياناتك بنجاح!');
-        localStorage.removeItem('registeredEmail');
-        location.reload();
-
-    } catch (error) {
-        console.error('Error:', error);
-        alert('حدث خطأ أثناء حذف البيانات. يرجى المحاولة مرة أخرى.');
+        document.getElementById("errror").textContent = errorMsg;
     }
 }
 
-    function editData() {
-        const userData = data.find(item => item.tasgel === tasgel);
-        if (userData) {
-            document.getElementById("nameedit").value = userData.name;
-            document.getElementById("emailedit").value = userData.useremail;
-            document.getElementById("idedit").value = userData.id;
-            document.getElementById("phoneedit").value = userData.phone;
-            document.getElementById("imageedit").src = userData.imageUrl;
-            message.style.display = 'block';
-            overlay.style.display = 'block';
-        }
-    }
+// عرض بيانات المستخدم
+function showUserData(userData) {
+    document.getElementById("userForm").style.display = "none";
+    document.getElementById("a").style.display = "none";
+    document.getElementById("aa").style.display = "none";
+    document.getElementById("aa1").style.display = "flex";
+    document.getElementById("aa3").style.display = "flex";
+    document.getElementById("a1").style.display = "flex";
+    document.getElementById("ab1").style.display = "flex";
+    document.getElementById("ab2").style.display = "block";
 
-async function saveData() {
-    const nameedit = document.getElementById('nameedit').value;
-    const emailedit = document.getElementById('emailedit').value;
-    const idedit = document.getElementById('idedit').value;
-    const phoneedit = document.getElementById('phoneedit').value;
-    const imageFile = document.getElementById('imageedit').files[0];
+    document.getElementById("email1").value = userData.useremail;
+    document.getElementById("image1").src = userData.image_url;
+    document.getElementById("name1").value = userData.name;
+    document.getElementById("id1").value = userData.id;
+    document.getElementById("phone1").value = userData.phone;
+
+    // إنشاء الباركود
+    const barcodeDiv = document.getElementById('barcode');
+    barcodeDiv.innerHTML = '';
+    new QRCode(barcodeDiv, {
+        text: `Email: ${userData.useremail}, Name: ${userData.name}, ID: ${userData.id}, Phone: ${userData.phone}`,
+        width: 120,
+        height: 120
+    });
+
+    // عرض حالة التسجيل
+    updateStatusMessage(userData.status);
+}
+
+// تحديث رسالة الحالة
+function updateStatusMessage(status) {
     const resala = document.getElementById('resala');
+    resala.innerHTML = '';
+    const statusMessage = document.createElement('div');
+    statusMessage.classList.add('status-message');
     
-    // التحقق من صحة البيانات
-    if (!nameedit || !emailedit || idedit.length != 14 || phoneedit.length != 11 || !imageFile) {
-        document.getElementById("errror1").textContent = "*يرجى ملء جميع البيانات.";
-        return;
+    if (status === 'pending') {
+        statusMessage.textContent = `جارٍ مراجعة بياناتك...`;
+        statusMessage.classList.add('pending');
+    } else if (status === 'approved') {
+        statusMessage.textContent = `تم مراجعة بياناتك، وتم الموافقة على تسجيلك.`;
+        statusMessage.classList.add('reviewed');
+    } else if (status === 'rejected') {
+        statusMessage.textContent = `بياناتك مرفوضة، ويجب تعديل بياناتك في أسرع وقت.`;
+        statusMessage.classList.add('urgent');
     }
 
-    try {
-        let imageUrl = document.getElementById("image1").src;
-        
-        // إذا تم تحميل صورة جديدة
-        if (imageFile) {
-            // 1. حذف الصورة القديمة (إن أردت)
-            // يمكنك تخطي هذه الخطوة إذا كنت تريد الاحتفاظ بجميع الصور
-            
-            // 2. تحميل الصورة الجديدة
-            const imageName = `profile_${Date.now()}_${imageFile.name}`;
-            const { error: uploadError } = await supabase.storage
-                .from('profiles')
-                .upload(imageName, imageFile);
-
-            if (uploadError) throw uploadError;
-
-            // 3. الحصول على رابط الصورة الجديدة
-            const { data: imageUrlData } = await supabase.storage
-                .from('profiles')
-                .getPublicUrl(imageName);
-
-            imageUrl = imageUrlData.publicUrl;
-        }
-
-        // 4. إنشاء الباركود الجديد
-        const barcodeData = `Email: ${emailedit}, Name: ${nameedit}, ID: ${idedit}, Phone: ${phoneedit}`;
-        const barcodeDiv = document.getElementById('barcode');
-        barcodeDiv.innerHTML = '';
-        new QRCode(barcodeDiv, {
-            text: barcodeData,
-            width: 128,
-            height: 128
-        });
-
-        const barcodeImg = barcodeDiv.querySelector('img').src;
-
-        // 5. تحديث البيانات في Supabase
-        const { data, error } = await supabase
-            .from('users')
-            .update({
-                name: nameedit,
-                useremail: emailedit,
-                id: idedit,
-                phone: phoneedit,
-                image_url: imageUrl,
-                barcode_img: barcodeImg,
-                status: 'pending',
-                updated_at: new Date().toISOString()
-            })
-            .eq('useremail', emailedit)
-            .select();
-
-        if (error) throw error;
-
-        alert('تم تعديل بياناتك بنجاح!');
-        location.reload();
-
-    } catch (error) {
-        console.error('Error:', error);
-        document.getElementById("errror1").textContent = "حدث خطأ أثناء تعديل البيانات. يرجى المحاولة مرة أخرى.";
-        
-        if (error.message.includes('duplicate key')) {
-            document.getElementById("errror1").textContent = "هذه البيانات بالفعل مسجلة لدينا، وممنوع التسجيل بنفس البيانات اكثر من مرة.";
-        }
-    }
+    resala.appendChild(statusMessage);
 }
 
+// تحميل بيانات المستخدم
 async function loadUserData() {
     const email = localStorage.getItem('registeredEmail');
     if (!email) return;
@@ -823,129 +742,196 @@ async function loadUserData() {
         if (error) throw error;
         if (!userData) return;
 
-        // عرض البيانات
-        document.getElementById("userForm").style.display = "none";
-        document.getElementById("a").style.display = "none";
-        document.getElementById("aa").style.display = "none";
-        document.getElementById("aa1").style.display = "flex";
-        document.getElementById("aa3").style.display = "flex";
-        document.getElementById("a1").style.display = "flex";
-        document.getElementById("ab1").style.display = "flex";
-        document.getElementById("ab2").style.display = "block";
-
-        document.getElementById("email1").value = userData.useremail;
-        document.getElementById("image1").src = userData.image_url;
-        document.getElementById("name1").value = userData.name;
-        document.getElementById("id1").value = userData.id;
-        document.getElementById("phone1").value = userData.phone;
-
-        // إنشاء الباركود
-        const barcodeDiv = document.getElementById('barcode');
-        barcodeDiv.innerHTML = '';
-        new QRCode(barcodeDiv, {
-            text: `Email: ${userData.useremail}, Name: ${userData.name}, ID: ${userData.id}, Phone: ${userData.phone}`,
-            width: 120,
-            height: 120
-        });
-
-        // عرض حالة التسجيل
-        const statusMessage = document.createElement('div');
-        statusMessage.classList.add('status-message');
-        
-        if (userData.status === 'pending') {
-            statusMessage.textContent = `جارٍ مراجعة بياناتك...`;
-            statusMessage.classList.add('pending');
-        } else if (userData.status === 'approved') {
-            statusMessage.textContent = `تم مراجعة بياناتك، وتم الموافقة على تسجيلك.`;
-            statusMessage.classList.add('reviewed');
-        } else if (userData.status === 'rejected') {
-            statusMessage.textContent = `بياناتك مرفوضة، ويجب تعديل بياناتك في أسرع وقت.`;
-            statusMessage.classList.add('urgent');
-        }
-
-        document.getElementById("resala").appendChild(statusMessage);
-
+        showUserData(userData);
     } catch (error) {
         console.error('Error loading user data:', error);
     }
 }
 
-    loadUserData();
+// حذف البيانات
+async function taqed() {
+    const email = document.getElementById("email1").value;
+    
+    try {
+        // حذف السجل من قاعدة البيانات
+        const { error } = await supabase
+            .from('users')
+            .delete()
+            .eq('useremail', email);
 
-    function Close() {
-        message.style.display = 'none';
-        message1.style.display = 'none';
-        overlay.style.display = 'none';
+        if (error) throw error;
+
+        alert('تم حذف بياناتك بنجاح!');
+        localStorage.removeItem('registeredEmail');
+        location.reload();
+    } catch (error) {
+        console.error('Error:', error);
+        alert('حدث خطأ أثناء حذف البيانات. يرجى المحاولة مرة أخرى.');
+    }
+}
+
+// تحرير البيانات
+async function editData() {
+    const email = document.getElementById("email1").value;
+    
+    try {
+        const { data: userData, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('useremail', email)
+            .single();
+
+        if (error) throw error;
+        if (!userData) return;
+
+        document.getElementById("nameedit").value = userData.name;
+        document.getElementById("emailedit").value = userData.useremail;
+        document.getElementById("idedit").value = userData.id;
+        document.getElementById("phoneedit").value = userData.phone;
+        document.getElementById("imageedit").value = '';
+        document.getElementById("errror1").textContent = '';
+        
+        message.style.display = 'block';
+        overlay.style.display = 'block';
+    } catch (error) {
+        console.error('Error loading user data for edit:', error);
+        alert('حدث خطأ أثناء تحميل البيانات للتعديل.');
+    }
+}
+
+// حفظ التعديلات
+async function saveData() {
+    const nameedit = document.getElementById('nameedit').value.trim();
+    const emailedit = document.getElementById('emailedit').value.trim();
+    const idedit = document.getElementById('idedit').value.trim();
+    const phoneedit = document.getElementById('phoneedit').value.trim();
+    const imageFile = document.getElementById('imageedit').files[0];
+    
+    // التحقق من صحة البيانات
+    if (!nameedit || !emailedit || idedit.length !== 14 || phoneedit.length !== 11) {
+        document.getElementById("errror1").textContent = "*يرجى ملء جميع البيانات.";
+        return;
+    }
+
+    if (!isEnglish(nameedit)) {
+        document.getElementById("errror1").textContent = "يجب كتابة الاسم باللغة الإنجليزية فقط.";
+        return;
     }
     
-    const resala = document.getElementById('resala');
-    resala.innerHTML = '';
+    if (!isEmail(emailedit)) {
+        document.getElementById("errror1").textContent = "يجب ان تنتهى صيغة الاميل ب (@gmail.com)";
+        return;
+    }
     
-    data.forEach((item, index) => {
-        const statusMessage = document.createElement('div');
-        statusMessage.classList.add('status-message');
-
-        if (item.a === -1) {
-            statusMessage.textContent = `جارٍ مراجعة بياناتك...`;
-            statusMessage.classList.add('pending');
-        } else if (item.a === 0) {
-            statusMessage.textContent = `تم مراجعة بياناتك، وتم الموافقة على تسجيلك.`;
-            statusMessage.classList.add('reviewed');
-        } else if (item.a === 1) {
-            statusMessage.textContent = `بياناتك مرفوضة، ويجب تعديل بياناتك في أسرع وقت.`;
-            statusMessage.classList.add('urgent');
-        }
-
-        resala.appendChild(statusMessage);
-    });
-    
-    const table = document.getElementById('table');
-    const tableContainer = document.getElementById('a1');
-
-    function checkTableOverflow() {
-      if (table.offsetWidth > tableContainer.offsetWidth) {
-        showNotification('لتحسين العرض، يرجى تفعيل خاصية التدوير التلقائي أو استخدام جهاز بشاشة أكبر', 'warning');
-      }
+    if (!startsWith(phoneedit)) {
+        document.getElementById("errror1").textContent = "يجب أن يبدأ رقم الهاتف بـ 010 او 011 او 012 او 015.";
+        return;
     }
 
-    checkTableOverflow();
+    try {
+        let imageUrl = document.getElementById("image1").src;
+        
+        // إذا تم تحميل صورة جديدة
+        if (imageFile) {
+            if (imageFile.size > 1048576) {
+                document.getElementById("errror1").textContent = "حجم الصورة يجب أن يكون أقل من 1MB.";
+                return;
+            }
 
-    window.addEventListener('resize', checkTableOverflow);
+            const imageName = `profile_${Date.now()}_${imageFile.name}`;
+            const { error: uploadError } = await supabase.storage
+                .from('profiles')
+                .upload(imageName, imageFile);
+
+            if (uploadError) throw uploadError;
+
+            // الحصول على رابط الصورة الجديدة
+            const { data: imageUrlData } = await supabase.storage
+                .from('profiles')
+                .getPublicUrl(imageName);
+
+            imageUrl = imageUrlData.publicUrl;
+        }
+
+        // إنشاء الباركود الجديد
+        const barcodeData = `Email: ${emailedit}, Name: ${nameedit}, ID: ${idedit}, Phone: ${phoneedit}`;
+        const barcodeDiv = document.getElementById('barcode');
+        barcodeDiv.innerHTML = '';
+        new QRCode(barcodeDiv, {
+            text: barcodeData,
+            width: 128,
+            height: 128
+        });
+
+        const barcodeImg = barcodeDiv.querySelector('img').src;
+
+        // تحديث البيانات
+        const { data, error } = await supabase
+            .from('users')
+            .update({
+                name: nameedit,
+                id: idedit,
+                phone: phoneedit,
+                image_url: imageUrl,
+                barcode_img: barcodeImg,
+                status: 'pending',
+                updated_at: new Date().toISOString()
+            })
+            .eq('useremail', emailedit)
+            .select();
+
+        if (error) throw error;
+
+        alert('تم تعديل بياناتك بنجاح!');
+        showUserData(data[0]);
+        Close();
+    } catch (error) {
+        console.error('Error:', error);
+        let errorMsg = "حدث خطأ أثناء تعديل البيانات. يرجى المحاولة مرة أخرى.";
+        
+        if (error.message.includes('duplicate key')) {
+            errorMsg = "هذه البيانات مسجلة بالفعل. لا يمكن التسجيل بنفس البيانات أكثر من مرة.";
+        }
+        
+        document.getElementById("errror1").textContent = errorMsg;
+    }
+}
+
+// إغلاق النوافذ المنبثقة
+function Close() {
+    message.style.display = 'none';
+    message1.style.display = 'none';
+    overlay.style.display = 'none';
+}
+
+// عرض الإشعارات
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
     
-    // Add notification styles
-    const style = document.createElement('style');
-    style.textContent = `
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 50px;
-            padding: 15px 25px;
-            border-radius: var(--border-radius);
-            color: white;
-            font-weight: 500;
-            box-shadow: var(--box-shadow);
-            transform: translateY(-150%);
-            transition: transform 0.3s ease;
-            z-index: 1100;
-        }
-        
-        .notification.show {
-            transform: translateX(0);
-        }
-        
-        .notification.success {
-            background-color: var(--success-color);
-        }
-        
-        .notification.warning {
-            background-color: var(--warning-color);
-        }
-        
-        .notification.error {
-            background-color: var(--danger-color);
-        }
-    `;
-    document.head.appendChild(style);
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 100);
+    
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+
+// عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', async () => {
+    const registrationOpen = await checkRegistrationStatus();
+    if (registrationOpen) {
+        await loadUserData();
+    }
+});
+<script>
+
 </script>
 </body>
 </html>
