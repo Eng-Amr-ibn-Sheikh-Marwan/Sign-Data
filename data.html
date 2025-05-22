@@ -3,25 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>data</title>
+    <title>نظام التسجيل</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             direction: rtl;
-            background-image: url(96030454-77b1-4daa-ba19-cf6bf45deb9b.webp);
-            background-size: cover; /* لتكبير الصورة لتغطية الشاشة */
-            background-position: center; /* لتوسيط الصورة */
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
         }
-    #total {
-        background-color: #ffffffa2;
-        border-radius: 30px;
-        padding: 10px; /* إضافة مسافة داخلية */
-        margin: 20px auto; /* توسيط العنصر وإضافة مسافة خارجية */
-        max-width: 95%; /* تحديد أقصى عرض لتجنب الامتداد الزائد */
-    }
-.overlay {
+        
+        #total {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 0 auto;
+            max-width: 1200px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .overlay {
             display: none;
             position: fixed;
             top: 0;
@@ -30,157 +34,228 @@
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
             z-index: 999;
-}
-#message {
-        display: none;
-        position: fixed;
-        width: 80%; /* تكبير عرض النافذة المنبثقة */
-        max-width: 800px; /* تحديد أقصى عرض */
-        padding: 20px; /* تقليل الحشو */
-        border-radius: 10px;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        background-color: white;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-}
+        }
+        
+        #message {
+            display: none;
+            position: fixed;
+            width: 90%;
+            max-width: 800px;
+            padding: 20px;
+            border-radius: 10px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+        
         #message table {
             width: 100%;
-            font-size: 18px; /* تكبير حجم الخط */
+            font-size: 16px;
             border-collapse: collapse;
             margin-bottom: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+        
         #message img {
-          width: 100px; /* تكبير حجم الصورة */
-          height: 100px;
+            width: 120px;
+            height: 120px;
+            border-radius: 5px;
+            object-fit: cover;
         }
-         #barcodeImg {
-        }
+        
         #message th, #message td {
-            border: 1px solid #ccc;
-            padding: 10px;
+            border: 1px solid #ddd;
+            padding: 12px;
             text-align: center;
         }
+        
         #message th {
             background-color: #007bff;
             color: white;
         }
+        
         #message button {
             background: #2da62d;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        
+        #message button:hover {
+            background: #228e22;
+        }
+        
+        input {
+            width: 200px;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+        
+        #a button {
+            background: #007bff;
             color: white;
             border: none;
             padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
-            transition: 0.3s;
+            font-size: 16px;
+            margin: 5px;
+            transition: all 0.3s;
         }
-        input {
-          width: 20%;
-          padding: 5px;
-          box-sizing: border-box;
-          border-radius: 5px;
-          border: 1px solid #ddd;
-          outline: none;
-          transition: 0.3s;
+        
+        #a button:hover {
+            background: #0069d9;
         }
-        input:focus {
-          border-color: #007bff;
-          box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
-        }
-        #a button {
-          background: #007bff;
-          color: white;
-          border: none;
-          margin: 0 10px 0 0;
-          padding: 10px 20px;
-          border-radius: 25px;
-          cursor: pointer;
-          transition: 0.3s;
-        }
+        
         #number1, #number2 {
-          display: flex;
-          justify-content: center;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 15px 0;
         }
-        #number1 h3, #number2  h3 {
-          margin: 0 10px;
+        
+        #number1 h3, #number2 h3 {
+            margin: 0 15px;
+            padding: 8px 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
         }
+        
         #newtasgel, #yes, #no, #yes1, #no1 {
-          border: 1px solid #007bff;
-          margin: 0 10px 10px 0;
-          padding: 10px 20px;
-          border-radius: 10px;
-          transition: 0.3s;
-          }
-          .pending {
+            border: none;
+            margin: 5px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .pending {
             background-color: #007bff;
-          }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 20px;
-    }
-    th, td {
-        border: 1px solid #ccc;
-        padding: 10px;
-        text-align: center;
-    }
-    th {
-        background-color: #007bff;
-        color: white;
-    }
-    td {
-      background-color: white;
-    }
-    .control button, #aaa1, #aaa2 {
-      padding: 5px 10px;
-      margin: 2px;
-      cursor: pointer;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      flex-wrap: wrap;
-    }
-    #aa {
-      width:;
-      padding: 8px;
-      box-sizing: border-box;
-      border-radius: 5px;
-      border: 1px solid #ddd;
-      outline: none;
-      transition: 0.3s;
-    }
-    #aa:hover {
-      border-color: #007bff;
-      box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
-    }
-    .tanbeh p {
-      color: red;
-    }
-    #user {
-            font-size: 20px;
-            margin: 10px 0;
+            color: white;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        th {
+            background-color: #007bff;
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+        
+        td {
+            background-color: white;
+        }
+        
+        .control button, #aaa1, #aaa2 {
+            padding: 8px 12px;
+            margin: 2px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        #aaa1 {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        #aaa2 {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        #aa {
+            padding: 8px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .tanbeh p {
+            color: #dc3545;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        
+        #user {
+            font-size: 16px;
             padding: 10px;
-            border-radius: 0;
+            border-radius: 5px;
+            margin: 10px 0;
         }
-    #user.pending {
-            background-color: #ffcc00; /* لون أصفر للبيانات قيد التعديل */
+        
+        #user.pending {
+            background-color: #ffc107;
+            color: black;
         }
-    #user.reviewed {
-            background-color: #4CAF50; /* لون أخضر للبيانات التي تمت مراجعتها */
+        
+        #user.reviewed {
+            background-color: #28a745;
             color: white;
         }
-    #user.urgent {
-            background-color: #f44336; /* لون أحمر للبيانات العاجلة */
+        
+        #user.urgent {
+            background-color: #dc3545;
             color: white;
         }
+        
         .amr {
-          user-select: none;
-          display: flex;
-          justify-content: center;
-          margin-top: 5px;
+            user-select: none;
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        /* تحسينات للعرض على الأجهزة الصغيرة */
+        @media (max-width: 768px) {
+            #a {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            input {
+                width: 90%;
+            }
+            
+            #message {
+                width: 95%;
+                padding: 10px;
+            }
+            
+            #message img {
+                width: 80px;
+                height: 80px;
+            }
         }
     </style>
 </head>
@@ -198,7 +273,6 @@
 <div class="tanbeh">
   <p>*لن يتم فتح التسجيل الا عند وضع عدد محدد للتسجيل.</p>
   <p>*بعد عملية التسجل اذا تم حذف العدد المطلوب سيتم غلق خاصية تعديل البيانات لدى المسجلين.</p>
-  <p></p>
 </div>
 <h2>المسجلين</h2>
 <div id="number1">
@@ -372,678 +446,551 @@
 </div>
 </div>
 <script>
-  const data = JSON.parse(localStorage.getItem('data') || '[]');
-  const maxRegistrations = JSON.parse(localStorage.getItem('maxRegistrations') || '[]');
-  document.getElementById("numberData").textContent = "عدد المسجلين: " + data.length;
-  let a = 0;
-  let a1 = 0;
-  let a2 = 0;
-  let a3 = 0;
-  let a4 = 0;
-  for (let i = 0; i < data.length; i++) {
-    if (data[i].a == 0) {
-      a++;
-    }
-    if (data[i].a == 1) {
-      a1++
-    }
-    if (data[i].status == 'دخل القاعة') {
-      a2++;
-    }
-    if (data[i].status == 'خرج من القاعة') {
-      a3++;
-    }
-    if (data[i].status == undefined) {
-      a4++;
-    }
-  }
-document.getElementById("numberData1").textContent = "عدد المقبولين: " + a;
-document.getElementById("numberData2").textContent = "عدد المرفوضين: " + a1;
-document.getElementById("numberData11").textContent = "عدد الحاضرين: " + a2;
-document.getElementById("numberData12").textContent = "عدد الغير موجودين: " + (a3 + a4);
-    function setMaxRegistrations() {
-        const maxRegistrations = document.getElementById('maxRegistrationsInput').value;
-        localStorage.setItem('maxRegistrations', maxRegistrations);
-        alert(`تم تعيين الحد الأقصى للمسجلين إلى ${maxRegistrations}`);
-        maxRegistrationsInput.value = maxRegistrations;
-    }
-    function checkLength(input, maxLength) {
-      if (input.value.length > maxLength) {
-        input.value = input.value.slice(0, maxLength);
-      }
-    }
-    function Close() {
-        message.style.display = 'none';
-        overlay.style.display = 'none';
-        barcodeInput.value = "";
-        barcodeInput.click();
+    // تهيئة Supabase
+    const supabaseUrl = 'YOUR_SUPABASE_URL';
+    const supabaseKey = 'YOUR_SUPABASE_KEY';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    // متغيرات عامة
+    let currentData = [];
+    let currentMatchedData = null;
+    let currentIndex = -1;
+
+    // تهيئة الصفحة عند التحميل
+    window.onload = async function() {
+        await loadData();
+        scanBarcode();
+        const maxRegistrations = await getMaxRegistrations();
+        document.getElementById("maxRegistrationsInput").value = maxRegistrations;
+    };
+
+    // الحصول على الحد الأقصى للمسجلين من Supabase
+    async function getMaxRegistrations() {
+        try {
+            const { data, error } = await supabase
+                .from('settings')
+                .select('max_registrations')
+                .single();
+            
+            if (error) throw error;
+            return data?.max_registrations || 0;
+        } catch (error) {
+            console.error('Error fetching max registrations:', error);
+            return 0;
+        }
     }
 
-    const newtasgel = document.getElementById('newtasgel');
-    const yes = document.getElementById('yes');
-    const no = document.getElementById('no');
-    const yes1 = document.getElementById('yes1');
-    const no1 = document.getElementById('no1');
-    newtasgel.classList.add('pending');
-    dataTable.style.display="block";
-    dataTable1.style.display="none";
-    dataTable2.style.display="none";
-    dataTable3.style.display="none";
-    dataTable4.style.display="none";
-function newTasgel() {
-      newtasgel.classList.add('pending');
-      yes.classList.remove('pending');
-      no.classList.remove('pending');
-      yes1.classList.remove('pending');
-      no1.classList.remove('pending');
-      dataTable.style.display="block";
-      dataTable1.style.display="none";
-      dataTable2.style.display="none";
-      dataTable3.style.display="none";
-      dataTable4.style.display="none";
+    // تعيين الحد الأقصى للمسجلين في Supabase
+    async function setMaxRegistrations() {
+        const maxRegistrations = document.getElementById('maxRegistrationsInput').value;
+        
+        try {
+            const { error } = await supabase
+                .from('settings')
+                .upsert({ id: 1, max_registrations: maxRegistrations });
+            
+            if (error) throw error;
+            alert(`تم تعيين الحد الأقصى للمسجلين إلى ${maxRegistrations}`);
+        } catch (error) {
+            console.error('Error setting max registrations:', error);
+            alert('حدث خطأ أثناء حفظ الإعدادات');
+        }
     }
-function yeS() {
-      yes.classList.add('pending');
-      newtasgel.classList.remove('pending');
-      no.classList.remove('pending');
-      yes1.classList.remove('pending');
-      no1.classList.remove('pending');
-      dataTable.style.display="none";
-      dataTable1.style.display="block";
-      dataTable2.style.display="none";
-      dataTable3.style.display="none";
-      dataTable4.style.display="none";
+
+    // تحميل البيانات من Supabase
+    async function loadData() {
+        try {
+            const { data, error } = await supabase
+                .from('registrations')
+                .select('*')
+                .order('created_at', { ascending: false });
+            
+            if (error) throw error;
+            
+            currentData = data || [];
+            updateCounters();
+            renderTables();
+        } catch (error) {
+            console.error('Error loading data:', error);
+            alert('حدث خطأ أثناء جلب البيانات');
+        }
     }
-function nO() {
-      no.classList.add('pending');
-      newtasgel.classList.remove('pending');
-      yes.classList.remove('pending');
-      yes1.classList.remove('pending');
-      no1.classList.remove('pending');
-      dataTable.style.display="none";
-      dataTable1.style.display="none";
-      dataTable2.style.display="block";
-      dataTable3.style.display="none";
-      dataTable4.style.display="none";
+
+    // تحديث العدادات
+    function updateCounters() {
+        document.getElementById("numberData").textContent = "عدد المسجلين: " + currentData.length;
+        
+        let a = 0; // مقبول
+        let a1 = 0; // مرفوض
+        let a2 = 0; // حاضرين
+        let a3 = 0; // غير موجودين
+        
+        currentData.forEach(item => {
+            if (item.status === 'accepted') a++;
+            if (item.status === 'rejected') a1++;
+            if (item.attendance_status === 'present') a2++;
+            if (item.attendance_status === 'absent' || !item.attendance_status) a3++;
+        });
+        
+        document.getElementById("numberData1").textContent = "عدد المقبولين: " + a;
+        document.getElementById("numberData2").textContent = "عدد المرفوضين: " + a1;
+        document.getElementById("numberData11").textContent = "عدد الحاضرين: " + a2;
+        document.getElementById("numberData12").textContent = "عدد الغير موجودين: " + a3;
     }
-function yeS1() {
-      yes1.classList.add('pending');
-      newtasgel.classList.remove('pending');
-      yes.classList.remove('pending');
-      no.classList.remove('pending');
-      no1.classList.remove('pending');
-      dataTable.style.display="none";
-      dataTable1.style.display="none";
-      dataTable2.style.display="none";
-      dataTable3.style.display="block";
-      dataTable4.style.display="none";
-    }
-function nO1() {
-      no1.classList.add('pending');
-      newtasgel.classList.remove('pending');
-      yes.classList.remove('pending');
-      no.classList.remove('pending');
-      yes1.classList.remove('pending');
-      dataTable.style.display="none";
-      dataTable1.style.display="none";
-      dataTable2.style.display="none";
-      dataTable3.style.display="none";
-      dataTable4.style.display="block";
-    }
-    function loadData() {
-        const data = JSON.parse(localStorage.getItem('data') || '[]');
+
+    // عرض الجداول
+    function renderTables() {
         const table = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
         const table1 = document.getElementById('dataTable1').getElementsByTagName('tbody')[0];
         const table2 = document.getElementById('dataTable2').getElementsByTagName('tbody')[0];
         const table3 = document.getElementById('dataTable3').getElementsByTagName('tbody')[0];
         const table4 = document.getElementById('dataTable4').getElementsByTagName('tbody')[0];
-        table.innerHTML = ''; // مسح الجدول قبل التحميل
-        table1.innerHTML = ''; // مسح الجدول قبل التحميل
-        table2.innerHTML = ''; // مسح الجدول قبل التحميل
-        table3.innerHTML = ''; // مسح الجدول قبل التحميل
-        table4.innerHTML = ''; // مسح الجدول قبل التحميل
-        data.forEach((item, index) => {
-            const newRow = table.insertRow();
-            if (item.a == -1) {
-            newRow.innerHTML = `
-                <td>${index + 1}</td>
-                <td class="control">
-                    <button onclick="removeRow(${index})">-</button>
-                </td>
-                <td><button id="aa">${item.timeTasgel}</button></td>
-                <td><button id="aa">${item.status}: ${item.timestamp}</button></td>
-                <td id="barcode"></td>
-                <td><img src="${item.imageUrl}" alt="Profile" width="50"></td>
-                <td><button id="aa">${index+1}</button></td>
-                <td><button id="aa">${item.useremail}</button></td>
-                <td><button id="aa">${item.name}</button></td>
-                <td><button id="aa">${item.id}</button></td>
-                <td><button id="aa">${item.phone}</button></td>
-                <td><button id="aa">${item.a}</button></td>
-                <td>
-                <button id="aaa1" onclick="taqed(${index})">✅</button>
-                <button id="aaa2" onclick="taqed1(${index})">❌</button>
-                </td>
-            `;
-                const barcodeDiv = document.getElementById('barcode');
-                barcodeDiv.innerHTML = '';
-                new QRCode(barcodeDiv, {
-                    text: `Email: ${item.useremail}, Name: ${item.name}, ID: ${item.id}, Phone: ${item.phone}`,
-                    width: 120,
-                    height: 120
+        
+        table.innerHTML = '';
+        table1.innerHTML = '';
+        table2.innerHTML = '';
+        table3.innerHTML = '';
+        table4.innerHTML = '';
+        
+        currentData.forEach((item, index) => {
+            const rowIndex = currentData.length - index;
+            
+            // الجدول الرئيسي (جميع البيانات)
+            if (!item.status || item.status === 'pending') {
+                const newRow = table.insertRow();
+                newRow.innerHTML = `
+                    <td>${rowIndex}</td>
+                    <td class="control">
+                        <button onclick="removeRow('${item.id}')">-</button>
+                    </td>
+                    <td><button id="aa">${formatDate(item.created_at)}</button></td>
+                    <td><button id="aa">${item.attendance_status || 'غير محدد'}: ${item.attendance_time ? formatDate(item.attendance_time) : ''}</button></td>
+                    <td class="barcode-cell" id="barcode-${item.id}"></td>
+                    <td><img src="${item.image_url}" alt="Profile" width="50"></td>
+                    <td><button id="aa">${rowIndex}</button></td>
+                    <td><button id="aa">${item.email}</button></td>
+                    <td><button id="aa">${item.name}</button></td>
+                    <td><button id="aa">${item.national_id}</button></td>
+                    <td><button id="aa">${item.phone}</button></td>
+                    <td><button id="aa">${item.status || 'قيد المراجعة'}</button></td>
+                    <td>
+                        <button id="aaa1" onclick="approveRegistration('${item.id}')">✅</button>
+                        <button id="aaa2" onclick="rejectRegistration('${item.id}')">❌</button>
+                    </td>
+                `;
+                
+                // إنشاء QR code
+                new QRCode(document.getElementById(`barcode-${item.id}`), {
+                    text: `Email: ${item.email}, Name: ${item.name}, ID: ${item.national_id}, Phone: ${item.phone}`,
+                    width: 80,
+                    height: 80
                 });
             }
-        });
-        data.forEach((item, index) => {
-            const newRow = table1.insertRow();
-            if (item.a == 0) {
-            newRow.innerHTML = `
-                <td>${index + 1}</td>
-                <td class="control">
-                    <button onclick="removeRow(${index})">-</button>
-                </td>
-                <td><button id="aa">${item.timeTasgel}</button></td>
-                <td><button id="aa">${item.status}: ${item.timestamp}</button></td>
-                <td id="barcode"></td>
-                <td><img src="${item.imageUrl}" alt="Profile" width="50"></td>
-                <td><button id="aa">${index+1}</button></td>
-                <td><button id="aa">${item.useremail}</button></td>
-                <td><button id="aa">${item.name}</button></td>
-                <td><button id="aa">${item.id}</button></td>
-                <td><button id="aa">${item.phone}</button></td>
-                <td><button id="aa">${item.a}</button></td>
-                <td>
-                <button id="aaa2" onclick="taqed1(${index})">❌</button>
-                </td>
-            `;
-                const barcodeDiv = document.getElementById('barcode');
-                barcodeDiv.innerHTML = '';
-                new QRCode(barcodeDiv, {
-                    text: `Email: ${item.useremail}, Name: ${item.name}, ID: ${item.id}, Phone: ${item.phone}`,
-                    width: 120,
-                    height: 120
+            
+            // الجدول الثاني (المقبولون)
+            if (item.status === 'accepted') {
+                const newRow = table1.insertRow();
+                newRow.innerHTML = `
+                    <td>${rowIndex}</td>
+                    <td class="control">
+                        <button onclick="removeRow('${item.id}')">-</button>
+                    </td>
+                    <td><button id="aa">${formatDate(item.created_at)}</button></td>
+                    <td><button id="aa">${item.attendance_status || 'غير محدد'}: ${item.attendance_time ? formatDate(item.attendance_time) : ''}</button></td>
+                    <td class="barcode-cell" id="barcode1-${item.id}"></td>
+                    <td><img src="${item.image_url}" alt="Profile" width="50"></td>
+                    <td><button id="aa">${rowIndex}</button></td>
+                    <td><button id="aa">${item.email}</button></td>
+                    <td><button id="aa">${item.name}</button></td>
+                    <td><button id="aa">${item.national_id}</button></td>
+                    <td><button id="aa">${item.phone}</button></td>
+                    <td><button id="aa">${item.status}</button></td>
+                    <td>
+                        <button id="aaa2" onclick="rejectRegistration('${item.id}')">❌</button>
+                    </td>
+                `;
+                
+                new QRCode(document.getElementById(`barcode1-${item.id}`), {
+                    text: `Email: ${item.email}, Name: ${item.name}, ID: ${item.national_id}, Phone: ${item.phone}`,
+                    width: 80,
+                    height: 80
                 });
             }
-        });
-        data.forEach((item, index) => {
-            const newRow = table2.insertRow();
-            if (item.a == 1) {
-            newRow.innerHTML = `
-                <td>${index + 1}</td>
-                <td class="control">
-                    <button onclick="removeRow(${index})">-</button>
-                </td>
-                <td><button id="aa">${item.timeTasgel}</button></td>
-                <td><button id="aa">${item.status}: ${item.timestamp}</button></td>
-                <td id="barcode"></td>
-                <td><img src="${item.imageUrl}" alt="Profile" width="50"></td>
-                <td><button id="aa">${index+1}</button></td>
-                <td><button id="aa">${item.useremail}</button></td>
-                <td><button id="aa">${item.name}</button></td>
-                <td><button id="aa">${item.id}</button></td>
-                <td><button id="aa">${item.phone}</button></td>
-                <td><button id="aa">${item.a}</button></td>
-                <td>
-                <button id="aaa1" onclick="taqed(${index})">✅</button>
-                </td>
-            `;
-                const barcodeDiv = document.getElementById('barcode');
-                barcodeDiv.innerHTML = '';
-                new QRCode(barcodeDiv, {
-                    text: `Email: ${item.useremail}, Name: ${item.name}, ID: ${item.id}, Phone: ${item.phone}`,
-                    width: 120,
-                    height: 120
+            
+            // الجدول الثالث (المرفوضون)
+            if (item.status === 'rejected') {
+                const newRow = table2.insertRow();
+                newRow.innerHTML = `
+                    <td>${rowIndex}</td>
+                    <td class="control">
+                        <button onclick="removeRow('${item.id}')">-</button>
+                    </td>
+                    <td><button id="aa">${formatDate(item.created_at)}</button></td>
+                    <td><button id="aa">${item.attendance_status || 'غير محدد'}: ${item.attendance_time ? formatDate(item.attendance_time) : ''}</button></td>
+                    <td class="barcode-cell" id="barcode2-${item.id}"></td>
+                    <td><img src="${item.image_url}" alt="Profile" width="50"></td>
+                    <td><button id="aa">${rowIndex}</button></td>
+                    <td><button id="aa">${item.email}</button></td>
+                    <td><button id="aa">${item.name}</button></td>
+                    <td><button id="aa">${item.national_id}</button></td>
+                    <td><button id="aa">${item.phone}</button></td>
+                    <td><button id="aa">${item.status}</button></td>
+                    <td>
+                        <button id="aaa1" onclick="approveRegistration('${item.id}')">✅</button>
+                    </td>
+                `;
+                
+                new QRCode(document.getElementById(`barcode2-${item.id}`), {
+                    text: `Email: ${item.email}, Name: ${item.name}, ID: ${item.national_id}, Phone: ${item.phone}`,
+                    width: 80,
+                    height: 80
                 });
             }
-        });
-        data.forEach((item, index) => {
-            const newRow = table3.insertRow();
-            if (item.status == 'دخل القاعة') {
-            newRow.innerHTML = `
-                <td>${index + 1}</td>
-                <td><button id="aa">${item.timeTasgel}</button></td>
-                <td><button id="aa">${item.status}: ${item.timestamp}</button></td>
-                <td id="barcode1"></td>
-                <td><img src="${item.imageUrl}" alt="Profile" width="50"></td>
-                <td><button id="aa">${index+1}</button></td>
-                <td><button id="aa">${item.useremail}</button></td>
-                <td><button id="aa">${item.name}</button></td>
-                <td><button id="aa">${item.id}</button></td>
-                <td><button id="aa">${item.phone}</button></td>
-                <td><button id="aa">${item.a}</button></td>
-            `;
-                const barcodeDiv = document.getElementById('barcode1');
-                barcodeDiv.innerHTML = '';
-                new QRCode(barcodeDiv, {
-                    text: `Email: ${item.useremail}, Name: ${item.name}, ID: ${item.id}, Phone: ${item.phone}`,
-                    width: 120,
-                    height: 120
+            
+            // الجدول الرابع (الحاضرون)
+            if (item.attendance_status === 'present') {
+                const newRow = table3.insertRow();
+                newRow.innerHTML = `
+                    <td>${rowIndex}</td>
+                    <td><button id="aa">${formatDate(item.created_at)}</button></td>
+                    <td><button id="aa">${item.attendance_status}: ${item.attendance_time ? formatDate(item.attendance_time) : ''}</button></td>
+                    <td class="barcode-cell" id="barcode3-${item.id}"></td>
+                    <td><img src="${item.image_url}" alt="Profile" width="50"></td>
+                    <td><button id="aa">${rowIndex}</button></td>
+                    <td><button id="aa">${item.email}</button></td>
+                    <td><button id="aa">${item.name}</button></td>
+                    <td><button id="aa">${item.national_id}</button></td>
+                    <td><button id="aa">${item.phone}</button></td>
+                    <td><button id="aa">${item.status || 'قيد المراجعة'}</button></td>
+                `;
+                
+                new QRCode(document.getElementById(`barcode3-${item.id}`), {
+                    text: `Email: ${item.email}, Name: ${item.name}, ID: ${item.national_id}, Phone: ${item.phone}`,
+                    width: 80,
+                    height: 80
                 });
             }
-        });
-        data.forEach((item, index) => {
-            const newRow = table4.insertRow();
-            if (item.status == 'خرج من القاعة' || item.status == undefined) {
-            newRow.innerHTML = `
-                <td>${index + 1}</td>
-                <td><button id="aa">${item.timeTasgel}</button></td>
-                <td><button id="aa">${item.status}: ${item.timestamp}</button></td>
-                <td id="barcode1"></td>
-                <td><img src="${item.imageUrl}" alt="Profile" width="50"></td>
-                <td><button id="aa">${index+1}</button></td>
-                <td><button id="aa">${item.useremail}</button></td>
-                <td><button id="aa">${item.name}</button></td>
-                <td><button id="aa">${item.id}</button></td>
-                <td><button id="aa">${item.phone}</button></td>
-                <td><button id="aa">${item.a}</button></td>
-            `;
-                const barcodeDiv = document.getElementById('barcode1');
-                barcodeDiv.innerHTML = '';
-                new QRCode(barcodeDiv, {
-                    text: `Email: ${item.useremail}, Name: ${item.name}, ID: ${item.id}, Phone: ${item.phone}`,
-                    width: 120,
-                    height: 120
+            
+            // الجدول الخامس (غير الحاضرين)
+            if (item.attendance_status === 'absent' || !item.attendance_status) {
+                const newRow = table4.insertRow();
+                newRow.innerHTML = `
+                    <td>${rowIndex}</td>
+                    <td><button id="aa">${formatDate(item.created_at)}</button></td>
+                    <td><button id="aa">${item.attendance_status || 'غير محدد'}: ${item.attendance_time ? formatDate(item.attendance_time) : ''}</button></td>
+                    <td class="barcode-cell" id="barcode4-${item.id}"></td>
+                    <td><img src="${item.image_url}" alt="Profile" width="50"></td>
+                    <td><button id="aa">${rowIndex}</button></td>
+                    <td><button id="aa">${item.email}</button></td>
+                    <td><button id="aa">${item.name}</button></td>
+                    <td><button id="aa">${item.national_id}</button></td>
+                    <td><button id="aa">${item.phone}</button></td>
+                    <td><button id="aa">${item.status || 'قيد المراجعة'}</button></td>
+                `;
+                
+                new QRCode(document.getElementById(`barcode4-${item.id}`), {
+                    text: `Email: ${item.email}, Name: ${item.name}, ID: ${item.national_id}, Phone: ${item.phone}`,
+                    width: 80,
+                    height: 80
                 });
             }
         });
     }
 
-    function removeRow(index) {
-        const data = JSON.parse(localStorage.getItem('data') || '[]');
-        data.splice(index, 1);
-        localStorage.setItem('data', JSON.stringify(data));
-        loadData(); // إعادة تحميل الجدول بعد الحذف
-    }
-    function taqed(index) {
-      const data = JSON.parse(localStorage.getItem('data') || '[]');
-      if (data[index]) {
-        data[index].a = 0; // تغيير قيمة `a` إلى 1
-        localStorage.setItem('data', JSON.stringify(data));
-        loadData(); // إعادة تحميل الجدول بعد التعديل
+    // حذف تسجيل
+    async function removeRow(id) {
+        if (!confirm('هل أنت متأكد من حذف هذا التسجيل؟')) return;
+        
+        try {
+            const { error } = await supabase
+                .from('registrations')
+                .delete()
+                .eq('id', id);
+            
+            if (error) throw error;
+            
+            await loadData();
+        } catch (error) {
+            console.error('Error deleting registration:', error);
+            alert('حدث خطأ أثناء حذف التسجيل');
         }
     }
-    function taqed1(index) {
-      const data = JSON.parse(localStorage.getItem('data') || '[]');
-      if (data[index]) {
-        data[index].a = 1; // تغيير قيمة `a` إلى 1
-        localStorage.setItem('data', JSON.stringify(data));
-        loadData(); // إعادة تحميل الجدول بعد التعديل
+
+    // قبول تسجيل
+    async function approveRegistration(id) {
+        try {
+            const { error } = await supabase
+                .from('registrations')
+                .update({ status: 'accepted' })
+                .eq('id', id);
+            
+            if (error) throw error;
+            
+            await loadData();
+        } catch (error) {
+            console.error('Error approving registration:', error);
+            alert('حدث خطأ أثناء قبول التسجيل');
         }
     }
+
+    // رفض تسجيل
+    async function rejectRegistration(id) {
+        try {
+            const { error } = await supabase
+                .from('registrations')
+                .update({ status: 'rejected' })
+                .eq('id', id);
+            
+            if (error) throw error;
+            
+            await loadData();
+        } catch (error) {
+            console.error('Error rejecting registration:', error);
+            alert('حدث خطأ أثناء رفض التسجيل');
+        }
+    }
+
+    // تحديث حالة الحضور
+    async function updateAttendanceStatus(id, status) {
+        try {
+            const { error } = await supabase
+                .from('registrations')
+                .update({ 
+                    attendance_status: status,
+                    attendance_time: new Date().toISOString()
+                })
+                .eq('id', id);
+            
+            if (error) throw error;
+            
+            await loadData();
+            Close();
+        } catch (error) {
+            console.error('Error updating attendance:', error);
+            alert('حدث خطأ أثناء تحديث حالة الحضور');
+        }
+    }
+
+    // مسح الباركود
     function parseBarcode(barcode) {
         const data = {};
-        const parts = barcode.split(', '); // تقسيم النص إلى أجزاء
-
+        const parts = barcode.split(', ');
+        
         parts.forEach(part => {
-            const [key, value] = part.split(': '); // تقسيم كل جزء إلى مفتاح وقيمة
-            if (key === 'Email') data.useremail = value;
+            const [key, value] = part.split(': ');
+            if (key === 'Email') data.email = value;
             if (key === 'Name') data.name = value;
-            if (key === 'ID') data.id = value;
+            if (key === 'ID') data.national_id = value;
             if (key === 'Phone') data.phone = value;
         });
-
-        console.log('Parsed Data:', data); // طباعة البيانات المستخرجة
-        return data; // إرجاع البيانات المستخرجة
+        
+        return data;
     }
 
+    // مسح الباركود
     function scanBarcode() {
         const barcodeInput = document.getElementById('barcodeInput');
-        const overlay = document.getElementById('overlay');
-        const message = document.getElementById('message');
-        const enterButton = message.querySelector('button'); // زر الدخول/الخروج
-
-        barcodeInput.addEventListener('input', function(event) {
+        
+        barcodeInput.addEventListener('input', async function(event) {
             const barcode = event.target.value;
-
-            // تحليل الباركود لاستخراج البيانات
+            if (barcode.length < 10) return;
+            
             const parsedData = parseBarcode(barcode);
-
-            // البحث عن البيانات المطابقة في localStorage
-            const data = JSON.parse(localStorage.getItem('data') || '[]');
-            const matchedData = data.find(item => item.id === parsedData.id); // مقارنة الرقم القومي فقط
-
-            console.log('Matched Data:', matchedData); // طباعة البيانات المطابقة
-
+            const matchedData = currentData.find(item => item.national_id === parsedData.national_id);
+            
             if (matchedData) {
-                // عرض البيانات المطابقة في النافذة المنبثقة
-                console.log('Updating message with:', matchedData); // تأكد من أن البيانات تصل هنا
-
-                // تحديث الصورة الشخصية
-                const profileImage = document.getElementById('profileImage');
-                profileImage.src = matchedData.imageUrl;
-                
-                const barcodeImg = document.getElementById('barcodeImg');
-                barcodeImg.innerHTML = '';
-                new QRCode(barcodeImg, {
-                    text: `Email: ${matchedData.useremail}, Name: ${matchedData.name}, ID: ${matchedData.id}, Phone: ${matchedData.phone}`,
-                    width: 120,
-                    height: 120
-                });
-                barcodeImg.src = barcodeImg;
-                
-                const emailData = document.getElementById('emailData');
-                emailData.textContent = matchedData.useremail;
-                // تحديث الاسم
-                const profileName = document.getElementById('profileName');
-                profileName.textContent = matchedData.name;
-                
-                const timeintasgel = document.getElementById('timeintasgel');
-                timeintasgel.textContent = matchedData.timeTasgel;
-                
-                const numberindata = document.getElementById('numberindata');
-                const rowIndex = data.indexOf(matchedData) + 1; // إضافة 1 لأن الفهرس يبدأ من الصفر
-                numberindata.textContent = rowIndex;
-                
-                // تحديث الاسم
-                const numberintasgel = document.getElementById('numberintasgel');
-                numberintasgel.textContent = rowIndex;
-                
-                // تحديث الباركود
-                const user = document.getElementById('user');
-                if (matchedData.a === -1) {
-                    user.textContent = `لم يتم مراجعة البيانات بعد.`;
-                    user.classList.add('pending'); // لون أصفر
-                } else if (matchedData.a === 0) {
-                    user.textContent = `تم مراجعة البيانات، وتم الموافقة على تسجيله.`;
-                    user.classList.add('reviewed'); // لون أخضر
-                } else if (matchedData.a === 1) {
-                    user.textContent = `البيانات مرفوضة، ويجب تعديل البيانات في أسرع وقت.`;
-                    user.classList.add('urgent'); // لون أحمر
-                }
-
-                // تحديث الرقم القومي
-                const idData = document.getElementById('idData');
-                idData.textContent = matchedData.id;
-
-                // تحديث رقم الموبايل
-                const phoneData = document.getElementById('phoneData');
-                phoneData.textContent = matchedData.phone;
-
-                // تحديث الحالة والوقت
-                const status1 = document.getElementById('status1');
-                const status2 = document.getElementById('status2');
-                const status3 = document.getElementById('status3');
-
-                if (matchedData.status === 'دخل القاعة') {
-                    status1.textContent = `دخل القاعة في: ${matchedData.timestamp}`;
-                    enterButton.textContent = 'خروج من القاعة';
-                } else {
-                    status1.textContent = `خرج من القاعة في: ${matchedData.timestamp}`;
-                    enterButton.textContent = 'دخل القاعة';
-                }
-
-                // عرض النافذة المنبثقة
-                message.style.display = 'block';
-                overlay.style.display = 'block';
-
-                // إضافة حدث للزر لتسجيل الدخول/الخروج
-                enterButton.onclick = function() {
-                    if (matchedData.status === 'دخل القاعة') {
-                        matchedData.status = 'خرج من القاعة';
-                        matchedData.timestamp = new Date().toLocaleString();
-                        enterButton.textContent = 'دخل القاعة';
-                    } else {
-                        matchedData.status = 'دخل القاعة';
-                        matchedData.timestamp = new Date().toLocaleString();
-                        enterButton.textContent = 'خروج من القاعة';
-                    }
-
-                    // تحديث الحالة والوقت
-                    status1.textContent = `${matchedData.status} في: ${matchedData.timestamp}`;
-
-                    // حفظ التغييرات في localStorage
-                    localStorage.setItem('data', JSON.stringify(data));
-                    message.style.display = "none";
-                    overlay.style.display = "none";
-                    barcodeInput.value = "";
-                    barcodeInput.click();
-                };
+                await showRegistrationDetails(matchedData);
+                barcodeInput.value = "";
             } else {
                 alert('البيانات غير موجودة في النظام');
                 barcodeInput.value = "";
-                barcodeInput.click();
+                barcodeInput.focus();
             }
         });
     }
-    function searchID() {
+
+    // البحث بالرقم القومي
+    async function searchID() {
         const idInput = document.getElementById('idInput');
-        const overlay = document.getElementById('overlay');
-        const message = document.getElementById('message');
-        const enterButton = message.querySelector('button'); // زر الدخول/الخروج
-
-            // البحث عن البيانات المطابقة في localStorage
-            const data = JSON.parse(localStorage.getItem('data') || '[]');
-            const matchedData = data.find(item => item.id === idInput.value); // مقارنة الرقم القومي فقط
-
-            console.log('Matched Data:', matchedData); // طباعة البيانات المطابقة
-
-            if (matchedData) {
-                // عرض البيانات المطابقة في النافذة المنبثقة
-                console.log('Updating message with:', matchedData); // تأكد من أن البيانات تصل هنا
-
-                // تحديث الصورة الشخصية
-                const profileImage = document.getElementById('profileImage');
-                profileImage.src = matchedData.imageUrl;
-                
-                const barcodeImg = document.getElementById('barcodeImg');
-                barcodeImg.innerHTML = '';
-                new QRCode(barcodeImg, {
-                    text: `Email: ${matchedData.useremail}, Name: ${matchedData.name}, ID: ${matchedData.id}, Phone: ${matchedData.phone}`,
-                    width: 120,
-                    height: 120
-                });
-                barcodeImg.src = barcodeImg;
-                
-                const emailData = document.getElementById('emailData');
-                emailData.textContent = matchedData.useremail;
-                
-                // تحديث الاسم
-                const profileName = document.getElementById('profileName');
-                profileName.textContent = matchedData.name;
-                
-                const timeintasgel = document.getElementById('timeintasgel');
-                timeintasgel.textContent = matchedData.timeTasgel;
-                
-                const numberindata = document.getElementById('numberindata');
-                const rowIndex = data.indexOf(matchedData) + 1; // إضافة 1 لأن الفهرس يبدأ من الصفر
-                numberindata.textContent = rowIndex;
-                
-                const numberintasgel = document.getElementById('numberintasgel');
-                numberintasgel.textContent = rowIndex;
-                
-                // تحديث الباركود
-                const user = document.getElementById('user');
-                if (matchedData.a === -1) {
-                    user.textContent = `لم يتم مراجعة البيانات بعد.`;
-                    user.classList.add('pending'); // لون أصفر
-                } else if (matchedData.a === 0) {
-                    user.textContent = `تم مراجعة البيانات، وتم الموافقة على تسجيله.`;
-                    user.classList.add('reviewed'); // لون أخضر
-                } else if (matchedData.a === 1) {
-                    user.textContent = `البيانات مرفوضة، ويجب تعديل البيانات في أسرع وقت.`;
-                    user.classList.add('urgent'); // لون أحمر
-                }
-
-                // تحديث الرقم القومي
-                const idData = document.getElementById('idData');
-                idData.textContent = matchedData.id;
-
-                // تحديث رقم الموبايل
-                const phoneData = document.getElementById('phoneData');
-                phoneData.textContent = matchedData.phone;
-
-                // تحديث الحالة والوقت
-                const status1 = document.getElementById('status1');
-                const status2 = document.getElementById('status2');
-                const status3 = document.getElementById('status3');
-
-                if (matchedData.status === 'دخل القاعة') {
-                    status1.textContent = `دخل القاعة في: ${matchedData.timestamp}`;
-                    enterButton.textContent = 'خروج من القاعة';
-                } else {
-                    status1.textContent = `خرج من القاعة في: ${matchedData.timestamp}`;
-                    enterButton.textContent = 'دخل القاعة';
-                }
-
-                // عرض النافذة المنبثقة
-                message.style.display = 'block';
-                overlay.style.display = 'block';
-
-                // إضافة حدث للزر لتسجيل الدخول/الخروج
-                enterButton.onclick = function() {
-                    if (matchedData.status === 'دخل القاعة') {
-                        matchedData.status = 'خرج من القاعة';
-                        matchedData.timestamp = new Date().toLocaleString();
-                        enterButton.textContent = 'دخل القاعة';
-                    } else {
-                        matchedData.status = 'دخل القاعة';
-                        matchedData.timestamp = new Date().toLocaleString();
-                        enterButton.textContent = 'خروج من القاعة';
-                    }
-
-                    // تحديث الحالة والوقت
-                    status1.textContent = `${matchedData.status} في: ${matchedData.timestamp}`;
-
-                    // حفظ التغييرات في localStorage
-                    localStorage.setItem('data', JSON.stringify(data));
-                    message.style.display = "none";
-                    overlay.style.display = "none";
-                    barcodeInput.value = "";
-                    barcodeInput.click();
-                };
-            } else {
-                alert('البيانات غير موجودة في النظام');
-            }
+        const id = idInput.value;
+        
+        if (!id || id.length !== 14) {
+            alert('الرجاء إدخال رقم قومي صحيح (14 رقمًا)');
+            return;
+        }
+        
+        const matchedData = currentData.find(item => item.national_id === id);
+        
+        if (matchedData) {
+            await showRegistrationDetails(matchedData);
+            idInput.value = "";
+        } else {
+            alert('البيانات غير موجودة في النظام');
+        }
     }
-    function searchPhone() {
+
+    // البحث برقم الموبايل
+    async function searchPhone() {
         const phoneInput = document.getElementById('phoneInput');
+        const phone = phoneInput.value;
+        
+        if (!phone || phone.length !== 11) {
+            alert('الرجاء إدخال رقم موبايل صحيح (11 رقمًا)');
+            return;
+        }
+        
+        const matchedData = currentData.find(item => item.phone === phone);
+        
+        if (matchedData) {
+            await showRegistrationDetails(matchedData);
+            phoneInput.value = "";
+        } else {
+            alert('البيانات غير موجودة في النظام');
+        }
+    }
+
+    // عرض تفاصيل التسجيل
+    async function showRegistrationDetails(item) {
+        currentMatchedData = item;
+        currentIndex = currentData.findIndex(i => i.id === item.id);
+        
         const overlay = document.getElementById('overlay');
         const message = document.getElementById('message');
-        const enterButton = message.querySelector('button'); // زر الدخول/الخروج
-
-            // البحث عن البيانات المطابقة في localStorage
-            const data = JSON.parse(localStorage.getItem('data') || '[]');
-            const matchedData = data.find(item => item.phone === phoneInput.value); // مقارنة الرقم القومي فقط
-
-            console.log('Matched Data:', matchedData); // طباعة البيانات المطابقة
-
-            if (matchedData) {
-                // عرض البيانات المطابقة في النافذة المنبثقة
-                console.log('Updating message with:', matchedData); // تأكد من أن البيانات تصل هنا
-                
-                // تحديث الصورة الشخصية
-                const profileImage = document.getElementById('profileImage');
-                profileImage.src = matchedData.imageUrl;
-                
-                const barcodeImg = document.getElementById('barcodeImg');
-                barcodeImg.innerHTML = '';
-                new QRCode(barcodeImg, {
-                    text: `Email: ${matchedData.useremail}, Name: ${matchedData.name}, ID: ${matchedData.id}, Phone: ${matchedData.phone}`,
-                    width: 120,
-                    height: 120
-                });
-                barcodeImg.src = barcodeImg;
-                
-                const emailData = document.getElementById('emailData');
-                emailData.textContent = matchedData.useremail;
-                
-                // تحديث الاسم
-                const profileName = document.getElementById('profileName');
-                profileName.textContent = matchedData.name;
-                
-                const timeintasgel = document.getElementById('timeintasgel');
-                timeintasgel.textContent = matchedData.timeTasgel;
-                
-                const numberindata = document.getElementById('numberindata');
-                const rowIndex = data.indexOf(matchedData) + 1; // إضافة 1 لأن الفهرس يبدأ من الصفر
-                numberindata.textContent = rowIndex;
-                
-                const numberintasgel = document.getElementById('numberintasgel');
-                numberintasgel.textContent = rowIndex;
-                
-                const user = document.getElementById('user');
-                if (matchedData.a === -1) {
-                    user.textContent = `لم يتم مراجعة البيانات بعد.`;
-                    user.classList.add('pending'); // لون أصفر
-                } else if (matchedData.a === 0) {
-                    user.textContent = `تم مراجعة البيانات، وتم الموافقة على تسجيله.`;
-                    user.classList.add('reviewed'); // لون أخضر
-                } else if (matchedData.a === 1) {
-                    user.textContent = `البيانات مرفوضة، ويجب تعديل البيانات في أسرع وقت.`;
-                    user.classList.add('urgent'); // لون أحمر
-                }
-
-                // تحديث الرقم القومي
-                const idData = document.getElementById('idData');
-                idData.textContent = matchedData.id;
-
-                // تحديث رقم الموبايل
-                const phoneData = document.getElementById('phoneData');
-                phoneData.textContent = matchedData.phone;
-
-                // تحديث الحالة والوقت
-                const status1 = document.getElementById('status1');
-                const status2 = document.getElementById('status2');
-                const status3 = document.getElementById('status3');
-
-                if (matchedData.status === 'دخل القاعة') {
-                    status1.textContent = `دخل القاعة في: ${matchedData.timestamp}`;
-                    enterButton.textContent = 'خروج من القاعة';
-                } else {
-                    status1.textContent = `خرج من القاعة في: ${matchedData.timestamp}`;
-                    enterButton.textContent = 'دخل القاعة';
-                }
-
-                // عرض النافذة المنبثقة
-                message.style.display = 'block';
-                overlay.style.display = 'block';
-
-                // إضافة حدث للزر لتسجيل الدخول/الخروج
-                enterButton.onclick = function() {
-                    if (matchedData.status === 'دخل القاعة') {
-                        matchedData.status = 'خرج من القاعة';
-                        matchedData.timestamp = new Date().toLocaleString();
-                        enterButton.textContent = 'دخل القاعة';
-                    } else {
-                        matchedData.status = 'دخل القاعة';
-                        matchedData.timestamp = new Date().toLocaleString();
-                        enterButton.textContent = 'خروج من القاعة';
-                    }
-
-                    // تحديث الحالة والوقت
-                    status1.textContent = `${matchedData.status} في: ${matchedData.timestamp}`;
-
-                    // حفظ التغييرات في localStorage
-                    localStorage.setItem('data', JSON.stringify(data));
-                    message.style.display = "none";
-                    overlay.style.display = "none";
-                    barcodeInput.value = "";
-                    barcodeInput.click();
-                };
+        const enterButton = document.getElementById('aaa');
+        
+        // تحديث البيانات في النافذة المنبثقة
+        document.getElementById('profileImage').src = item.image_url;
+        
+        const barcodeImg = document.getElementById('barcodeImg');
+        barcodeImg.innerHTML = '';
+        new QRCode(barcodeImg, {
+            text: `Email: ${item.email}, Name: ${item.name}, ID: ${item.national_id}, Phone: ${item.phone}`,
+            width: 120,
+            height: 120
+        });
+        
+        document.getElementById('emailData').textContent = item.email;
+        document.getElementById('profileName').textContent = item.name;
+        document.getElementById('timeintasgel').textContent = formatDate(item.created_at);
+        document.getElementById('numberindata').textContent = currentData.length - currentIndex;
+        document.getElementById('numberintasgel').textContent = currentData.length - currentIndex;
+        document.getElementById('idData').textContent = item.national_id;
+        document.getElementById('phoneData').textContent = item.phone;
+        
+        const user = document.getElementById('user');
+        if (!item.status || item.status === 'pending') {
+            user.textContent = 'لم يتم مراجعة البيانات بعد.';
+            user.className = 'pending';
+        } else if (item.status === 'accepted') {
+            user.textContent = 'تم مراجعة البيانات، وتم الموافقة على تسجيله.';
+            user.className = 'reviewed';
+        } else if (item.status === 'rejected') {
+            user.textContent = 'البيانات مرفوضة، ويجب تعديل البيانات في أسرع وقت.';
+            user.className = 'urgent';
+        }
+        
+        const status1 = document.getElementById('status1');
+        if (item.attendance_status === 'present') {
+            status1.textContent = `دخل القاعة في: ${formatDate(item.attendance_time)}`;
+            enterButton.textContent = 'خروج من القاعة';
+        } else {
+            status1.textContent = `خرج من القاعة في: ${item.attendance_time ? formatDate(item.attendance_time) : 'لم يسجل بعد'}`;
+            enterButton.textContent = 'دخل القاعة';
+        }
+        
+        // عرض النافذة المنبثقة
+        message.style.display = 'block';
+        overlay.style.display = 'block';
+        
+        // إضافة حدث للزر لتسجيل الدخول/الخروج
+        enterButton.onclick = function() {
+            if (item.attendance_status === 'present') {
+                updateAttendanceStatus(item.id, 'absent');
             } else {
-                alert('البيانات غير موجودة في النظام');
+                updateAttendanceStatus(item.id, 'present');
             }
+        };
     }
-    window.onload = function() {
-        loadData();
-        scanBarcode();
-        const maxRegistrations = JSON.parse(localStorage.getItem('maxRegistrations') || '[]');
-        maxRegistrationsInput.value = maxRegistrations;
-    };
-//document.addEventListener("keypress", function(event) {
-  //if (event.key === "Enter") {
-    // حدد الزر الذي تريد تفعيله
-    //var aaa = document.getElementById("aaa");
-    // قم بتفعيل الزر
-    //aaa.click();
-  //}
-  //if (event.key === "close") {
-    // حدد الزر الذي تريد تفعيله
-    //var close = document.getElementById("close");
-    // قم بتفعيل الزر
-    //close.click();
-  //}
-//});
+
+    // إغلاق النافذة المنبثقة
+    function Close() {
+        document.getElementById('message').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('barcodeInput').value = "";
+        document.getElementById('barcodeInput').focus();
+    }
+
+    // التحقق من طول النص
+    function checkLength(input, maxLength) {
+        if (input.value.length > maxLength) {
+            input.value = input.value.slice(0, maxLength);
+        }
+    }
+
+    // تنسيق التاريخ
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleString('ar-EG');
+    }
+
+    // وظائف تبديل الجداول
+    function newTasgel() {
+        toggleButtons('newtasgel');
+        document.getElementById("dataTable").style.display = "block";
+        document.getElementById("dataTable1").style.display = "none";
+        document.getElementById("dataTable2").style.display = "none";
+        document.getElementById("dataTable3").style.display = "none";
+        document.getElementById("dataTable4").style.display = "none";
+    }
+    
+    function yeS() {
+        toggleButtons('yes');
+        document.getElementById("dataTable").style.display = "none";
+        document.getElementById("dataTable1").style.display = "block";
+        document.getElementById("dataTable2").style.display = "none";
+        document.getElementById("dataTable3").style.display = "none";
+        document.getElementById("dataTable4").style.display = "none";
+    }
+    
+    function nO() {
+        toggleButtons('no');
+        document.getElementById("dataTable").style.display = "none";
+        document.getElementById("dataTable1").style.display = "none";
+        document.getElementById("dataTable2").style.display = "block";
+        document.getElementById("dataTable3").style.display = "none";
+        document.getElementById("dataTable4").style.display = "none";
+    }
+    
+    function yeS1() {
+        toggleButtons('yes1');
+        document.getElementById("dataTable").style.display = "none";
+        document.getElementById("dataTable1").style.display = "none";
+        document.getElementById("dataTable2").style.display = "none";
+        document.getElementById("dataTable3").style.display = "block";
+        document.getElementById("dataTable4").style.display = "none";
+    }
+    
+    function nO1() {
+        toggleButtons('no1');
+        document.getElementById("dataTable").style.display = "none";
+        document.getElementById("dataTable1").style.display = "none";
+        document.getElementById("dataTable2").style.display = "none";
+        document.getElementById("dataTable3").style.display = "none";
+        document.getElementById("dataTable4").style.display = "block";
+    }
+    
+    function toggleButtons(activeButtonId) {
+        const buttons = ['newtasgel', 'yes', 'no', 'yes1', 'no1'];
+        buttons.forEach(buttonId => {
+            const button = document.getElementById(buttonId);
+            if (buttonId === activeButtonId) {
+                button.classList.add('pending');
+            } else {
+                button.classList.remove('pending');
+            }
+        });
+    }
 </script>
 </body>
 </html>
